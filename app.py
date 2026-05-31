@@ -22,7 +22,6 @@ st.markdown("""
         border-right: 1px solid #1e293b;
     }
     [data-testid="stSidebar"] * { color: #94a3b8 !important; }
-
     [data-testid="stSidebar"] .stRadio > div { gap: 0px; }
     [data-testid="stSidebar"] .stRadio input[type="radio"] { display: none; }
     [data-testid="stSidebar"] .stRadio label {
@@ -43,23 +42,15 @@ st.markdown("""
 
     .top-header {
         background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f4c81 100%);
-        padding: 28px 40px;
-        border-radius: 16px;
-        margin-bottom: 28px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        padding: 28px 40px; border-radius: 16px;
+        margin-bottom: 28px; display: flex;
+        justify-content: space-between; align-items: center;
     }
-    .header-title {
-        font-size: 1.8rem; font-weight: 800;
-        color: white; letter-spacing: -0.5px; margin: 0;
-    }
+    .header-title { font-size: 1.8rem; font-weight: 800; color: white; letter-spacing: -0.5px; margin: 0; }
     .header-sub { font-size: 0.85rem; color: #94a3b8; margin: 6px 0 0 0; }
     .header-badge {
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: white; padding: 8px 18px;
-        border-radius: 20px; font-size: 13px; font-weight: 600;
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+        color: white; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600;
     }
 
     .section-title {
@@ -82,20 +73,14 @@ st.markdown("""
         font-weight: 600 !important; text-transform: uppercase !important;
         letter-spacing: 0.8px !important;
     }
-    [data-testid="stMetricValue"] {
-        color: #0f172a !important; font-weight: 800 !important;
-        font-size: 2rem !important;
-    }
+    [data-testid="stMetricValue"] { color: #0f172a !important; font-weight: 800 !important; font-size: 2rem !important; }
 
     .stButton > button {
-        background: #0f4c81; color: white !important;
-        border: none; border-radius: 10px;
-        padding: 12px 28px; font-weight: 600;
+        background: #0f4c81; color: white !important; border: none;
+        border-radius: 10px; padding: 12px 28px; font-weight: 600;
         font-size: 14px; transition: 0.2s; width: 100%;
     }
-    .stButton > button:hover {
-        background: #0d3d6b; transform: translateY(-1px);
-    }
+    .stButton > button:hover { background: #0d3d6b; transform: translateY(-1px); }
 
     .stTextInput > div > div > input {
         border-radius: 10px; border: 1.5px solid #e2e8f0;
@@ -118,6 +103,13 @@ st.markdown("""
         border-radius: 12px; overflow: hidden;
         box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
+
+    /* Hide chart toolbar */
+    [data-testid="StyledFullScreenButton"] { display: none !important; }
+    button[title="View fullscreen"] { display: none !important; }
+    [data-testid="baseButton-headerNoPadding"] { display: none !important; }
+    .modebar { display: none !important; }
+    [data-testid="stElementToolbar"] { display: none !important; }
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
