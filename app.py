@@ -136,8 +136,7 @@ st.sidebar.markdown("""
 
 page = st.sidebar.radio("NAVIGATION", ["Dashboard", "ML Model", "Drug Segments", "AI Recommendations", "Ask AI"])
 st.sidebar.markdown("---")
-api_key = "your-groq-key-here"
-
+api_key = "gsk_your_actual_key_here"
 @st.cache_data
 def load_data():
     df = pd.read_csv("archive (3)/salesdaily.csv")
