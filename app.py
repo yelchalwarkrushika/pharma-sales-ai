@@ -95,7 +95,7 @@ api_key = "your-groq-key-here"
 # Load data
 @st.cache_data
 def load_data():
-    df = pd.read_csv(r"C:\Users\reddy\Downloads\archive (3)\salesdaily.csv")
+df = pd.read_csv("archive (3)/salesdaily.csv")
     df['datum'] = pd.to_datetime(df['datum'])
     drug_cols = ['M01AB', 'M01AE', 'N02BA', 'N02BE', 'N05B', 'N05C', 'R03', 'R06']
     df['total_sales'] = df[drug_cols].sum(axis=1)
