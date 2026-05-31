@@ -9,18 +9,11 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from groq import Groq
 
-# Page config
-st.set_page_config(
-    page_title="Pharma Sales AI",
-    page_icon="💊",
-    layout="wide"
-)
+st.set_page_config(page_title="Pharma Sales AI", page_icon="💊", layout="wide")
 
-# Custom CSS
 st.markdown("""
 <style>
     .stApp { background-color: #f8f5ff; }
-
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1a0533 0%, #3b0764 50%, #6d28d9 100%);
     }
@@ -29,7 +22,6 @@ st.markdown("""
         color: rgba(255,255,255,0.8) !important;
         font-size: 15px; padding: 8px 0;
     }
-
     .main-header {
         font-size: 2.5rem; font-weight: 800;
         color: #5B2D8E; text-align: center;
@@ -39,7 +31,6 @@ st.markdown("""
         text-align: center; color: #888;
         margin-bottom: 30px; font-size: 1rem;
     }
-
     [data-testid="stMetric"] {
         background: white; border-radius: 16px;
         padding: 20px; box-shadow: 0 4px 15px rgba(91,45,142,0.1);
@@ -47,7 +38,6 @@ st.markdown("""
     }
     [data-testid="stMetricLabel"] { color: #888 !important; font-size: 13px !important; }
     [data-testid="stMetricValue"] { color: #5B2D8E !important; font-weight: 700 !important; }
-
     .stButton > button {
         background: linear-gradient(135deg, #7c3aed, #ec4899);
         color: white !important; border: none;
@@ -59,7 +49,6 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(124,58,237,0.4);
     }
-
     .stTextInput > div > div > input {
         border-radius: 12px; border: 2px solid #e5e7eb;
         padding: 12px 16px; font-size: 15px;
@@ -68,34 +57,28 @@ st.markdown("""
         border-color: #7c3aed;
         box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
     }
-
     h2, h3 { color: #1a1a1a; font-weight: 700; }
-
     [data-testid="stDataFrame"] {
         border-radius: 12px; overflow: hidden;
         box-shadow: 0 2px 15px rgba(0,0,0,0.06);
     }
-
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# Header
 st.markdown('<p class="main-header">💊 Pharma Sales AI Assistant</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">ML Forecasting + AI Recommendations + Drug Segmentation</p>', unsafe_allow_html=True)
 
-# Sidebar
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Dashboard", "ML Model", "Drug Segments", "AI Recommendations", "Ask AI"])
 st.sidebar.markdown("---")
 api_key = "your-groq-key-here"
 
-# Load data
 @st.cache_data
 def load_data():
-df = pd.read_csv("archive (3)/salesdaily.csv")
+    df = pd.read_csv("archive (3)/salesdaily.csv")
     df['datum'] = pd.to_datetime(df['datum'])
     drug_cols = ['M01AB', 'M01AE', 'N02BA', 'N02BE', 'N05B', 'N05C', 'R03', 'R06']
     df['total_sales'] = df[drug_cols].sum(axis=1)
@@ -104,7 +87,6 @@ df = pd.read_csv("archive (3)/salesdaily.csv")
 
 df, drug_cols = load_data()
 
-# Train model
 @st.cache_resource
 def train_model(df, drug_cols):
     weekday_map = {'Monday':0,'Tuesday':1,'Wednesday':2,'Thursday':3,'Friday':4,'Saturday':5,'Sunday':6}
@@ -123,7 +105,6 @@ def train_model(df, drug_cols):
 
 rf, r2, mae, features = train_model(df, drug_cols)
 
-# DASHBOARD
 if page == "Dashboard":
     st.subheader("Sales Overview")
     col1, col2, col3, col4 = st.columns(4)
@@ -152,8 +133,8 @@ if page == "Dashboard":
         fig, ax = plt.subplots(figsize=(8,4))
         fig.patch.set_facecolor('white')
         ax.set_facecolor('#faf5ff')
-        bars = ax.bar(drug_totals.index, drug_totals.values,
-                     color=['#7c3aed','#9b4dca','#b06de0','#c58df5','#a855f7','#ec4899','#f472b6','#f9a8d4'])
+        ax.bar(drug_totals.index, drug_totals.values,
+               color=['#7c3aed','#9b4dca','#b06de0','#c58df5','#a855f7','#ec4899','#f472b6','#f9a8d4'])
         ax.set_xlabel("Drug"); ax.set_ylabel("Total Units")
         ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
         plt.xticks(rotation=45)
@@ -182,7 +163,6 @@ if page == "Dashboard":
         ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
         st.pyplot(fig)
 
-# ML MODEL
 elif page == "ML Model":
     st.subheader("Random Forest Sales Predictor")
     col1, col2 = st.columns(2)
@@ -224,7 +204,6 @@ elif page == "ML Model":
     ax.legend(); plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# DRUG SEGMENTS
 elif page == "Drug Segments":
     st.subheader("Drug Segmentation — KMeans Clustering")
     drug_profiles = df[drug_cols].describe().T[['mean','std','max']]
@@ -254,7 +233,6 @@ elif page == "Drug Segments":
         ax.legend()
         st.pyplot(fig)
 
-# AI RECOMMENDATIONS
 elif page == "AI Recommendations":
     st.subheader("AI Generated Business Recommendations")
     if not api_key:
@@ -286,7 +264,6 @@ elif page == "AI Recommendations":
                 )
                 st.markdown(response.choices[0].message.content)
 
-# ASK AI
 elif page == "Ask AI":
     st.subheader("Ask Anything About Pharma Sales")
     if not api_key:
