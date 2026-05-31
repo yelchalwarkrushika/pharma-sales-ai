@@ -9,70 +9,222 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from groq import Groq
 
-st.set_page_config(page_title="Pharma Sales AI", page_icon="💊", layout="wide")
+st.set_page_config(page_title="Pharma Sales Intelligence", page_icon="📊", layout="wide")
 
 st.markdown("""
 <style>
-    .stApp { background-color: #f8f5ff; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * { font-family: 'Inter', sans-serif; }
+
+    .stApp { background-color: #f0f2f6; }
+
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a0533 0%, #3b0764 50%, #6d28d9 100%);
+        background: #0f172a;
+        border-right: 1px solid #1e293b;
     }
-    [data-testid="stSidebar"] * { color: white !important; }
+    [data-testid="stSidebar"] * { color: #94a3b8 !important; }
     [data-testid="stSidebar"] .stRadio label {
-        color: rgba(255,255,255,0.8) !important;
-        font-size: 15px; padding: 8px 0;
+        font-size: 14px !important;
+        padding: 10px 0 !important;
+        font-weight: 500 !important;
     }
-    .main-header {
-        font-size: 2.5rem; font-weight: 800;
-        color: #5B2D8E; text-align: center;
-        margin-bottom: 5px; letter-spacing: -1px;
+    [data-testid="stSidebar"] .stRadio label:hover {
+        color: white !important;
     }
-    .sub-header {
-        text-align: center; color: #888;
-        margin-bottom: 30px; font-size: 1rem;
+
+    /* Header */
+    .top-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f4c81 100%);
+        padding: 28px 40px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    [data-testid="stMetric"] {
-        background: white; border-radius: 16px;
-        padding: 20px; box-shadow: 0 4px 15px rgba(91,45,142,0.1);
-        border-left: 4px solid #7c3aed;
+
+    .header-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: white;
+        letter-spacing: -0.5px;
+        margin: 0;
     }
-    [data-testid="stMetricLabel"] { color: #888 !important; font-size: 13px !important; }
-    [data-testid="stMetricValue"] { color: #5B2D8E !important; font-weight: 700 !important; }
+
+    .header-sub {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        margin: 6px 0 0 0;
+    }
+
+    .header-badge {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* Metric cards */
+    .metric-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 14px;
+        padding: 22px 24px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        border-top: 3px solid #0f4c81;
+    }
+
+    .metric-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 8px;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    .metric-sub {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 6px;
+    }
+
+    /* Chart cards */
+    .chart-card {
+        background: white;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+    }
+
+    .chart-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .chart-sub {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-bottom: 16px;
+    }
+
+    /* Section title */
+    .section-title {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Buttons */
     .stButton > button {
-        background: linear-gradient(135deg, #7c3aed, #ec4899);
-        color: white !important; border: none;
-        border-radius: 12px; padding: 12px 30px;
-        font-weight: 600; font-size: 15px;
-        transition: 0.3s; width: 100%;
+        background: #0f4c81;
+        color: white !important;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 28px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: 0.2s;
+        width: 100%;
     }
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(124,58,237,0.4);
+        background: #0d3d6b;
+        transform: translateY(-1px);
     }
+
+    /* Input */
     .stTextInput > div > div > input {
-        border-radius: 12px; border: 2px solid #e5e7eb;
-        padding: 12px 16px; font-size: 15px;
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        padding: 12px 16px;
+        font-size: 14px;
+        background: white;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #7c3aed;
-        box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+        border-color: #0f4c81;
+        box-shadow: 0 0 0 3px rgba(15,76,129,0.1);
     }
-    h2, h3 { color: #1a1a1a; font-weight: 700; }
-    [data-testid="stDataFrame"] {
-        border-radius: 12px; overflow: hidden;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+
+    /* Sidebar logo */
+    .sidebar-logo {
+        padding: 24px 16px 16px;
+        border-bottom: 1px solid #1e293b;
+        margin-bottom: 16px;
     }
+
+    .sidebar-logo-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: white !important;
+    }
+
+    .sidebar-logo-sub {
+        font-size: 11px;
+        color: #475569 !important;
+        margin-top: 3px;
+    }
+
+    [data-testid="stMetric"] {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        border-top: 3px solid #0f4c81;
+    }
+    [data-testid="stMetricLabel"] { color: #64748b !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.8px !important; }
+    [data-testid="stMetricValue"] { color: #0f172a !important; font-weight: 800 !important; font-size: 2rem !important; }
+
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-header">💊 Pharma Sales AI Assistant</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">ML Forecasting + AI Recommendations + Drug Segmentation</p>', unsafe_allow_html=True)
+# Header
+st.markdown("""
+<div class="top-header">
+    <div>
+        <p class="header-title">Pharma Sales Intelligence Platform</p>
+        <p class="header-sub">Real-time analytics · ML Forecasting · AI Recommendations · Drug Segmentation</p>
+    </div>
+    <div class="header-badge">Enterprise Analytics</div>
+</div>
+""", unsafe_allow_html=True)
 
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Dashboard", "ML Model", "Drug Segments", "AI Recommendations", "Ask AI"])
+# Sidebar
+st.sidebar.markdown("""
+<div class="sidebar-logo">
+    <p class="sidebar-logo-text">PSI Platform</p>
+    <p class="sidebar-logo-sub">Pharma Sales Intelligence</p>
+</div>
+""", unsafe_allow_html=True)
+
+page = st.sidebar.radio("NAVIGATION", ["Dashboard", "ML Model", "Drug Segments", "AI Recommendations", "Ask AI"])
 st.sidebar.markdown("---")
 api_key = "your-groq-key-here"
 
@@ -105,84 +257,98 @@ def train_model(df, drug_cols):
 
 rf, r2, mae, features = train_model(df, drug_cols)
 
+def make_chart(figsize=(8,4)):
+    fig, ax = plt.subplots(figsize=figsize)
+    fig.patch.set_facecolor('white')
+    ax.set_facecolor('white')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color('#e2e8f0')
+    ax.spines['bottom'].set_color('#e2e8f0')
+    ax.tick_params(colors='#64748b', labelsize=10)
+    ax.yaxis.label.set_color('#64748b')
+    ax.xaxis.label.set_color('#64748b')
+    return fig, ax
+
+# DASHBOARD
 if page == "Dashboard":
-    st.subheader("Sales Overview")
+    st.markdown('<p class="section-title">Key Performance Indicators</p>', unsafe_allow_html=True)
+
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Records", f"{len(df):,}")
-    col2.metric("Avg Daily Sales", f"{df['total_sales'].mean():.1f}")
-    col3.metric("Peak Sales", f"{df['total_sales'].max():.1f}")
-    col4.metric("Date Range", f"{df['datum'].dt.year.min()} - {df['datum'].dt.year.max()}")
-    st.markdown("---")
+    col1.metric("Total Records", f"{len(df):,}", "2014 - 2019")
+    col2.metric("Avg Daily Sales", f"{df['total_sales'].mean():.1f}", "units/day")
+    col3.metric("Peak Daily Sales", f"{df['total_sales'].max():.1f}", "all time high")
+    col4.metric("Drug Categories", f"{len(drug_cols)}", "tracked")
+
+    st.markdown('<p class="section-title" style="margin-top:24px">Sales Analytics</p>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Monthly Sales Trend")
+        st.markdown('<div class="chart-card"><p class="chart-title">Monthly Sales Trend</p><p class="chart-sub">Total units sold per month across all drug categories</p>', unsafe_allow_html=True)
         monthly = df.groupby(['Year','Month'])['total_sales'].sum().reset_index()
-        fig, ax = plt.subplots(figsize=(8,4))
-        fig.patch.set_facecolor('white')
-        ax.set_facecolor('#faf5ff')
-        ax.plot(range(len(monthly)), monthly['total_sales'], color='#7c3aed', linewidth=2.5)
-        ax.fill_between(range(len(monthly)), monthly['total_sales'], alpha=0.1, color='#7c3aed')
-        ax.set_xlabel("Month"); ax.set_ylabel("Total Sales")
-        ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+        fig, ax = make_chart((8,4))
+        ax.plot(range(len(monthly)), monthly['total_sales'], color='#0f4c81', linewidth=2)
+        ax.fill_between(range(len(monthly)), monthly['total_sales'], alpha=0.08, color='#0f4c81')
+        ax.set_xlabel("Month Index")
+        ax.set_ylabel("Total Sales")
         st.pyplot(fig)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.subheader("Sales by Drug Category")
+        st.markdown('<div class="chart-card"><p class="chart-title">Drug Category Performance</p><p class="chart-sub">Cumulative units sold per drug category</p>', unsafe_allow_html=True)
         drug_totals = df[drug_cols].sum().sort_values(ascending=False)
-        fig, ax = plt.subplots(figsize=(8,4))
-        fig.patch.set_facecolor('white')
-        ax.set_facecolor('#faf5ff')
-        ax.bar(drug_totals.index, drug_totals.values,
-               color=['#7c3aed','#9b4dca','#b06de0','#c58df5','#a855f7','#ec4899','#f472b6','#f9a8d4'])
-        ax.set_xlabel("Drug"); ax.set_ylabel("Total Units")
-        ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+        fig, ax = make_chart((8,4))
+        colors = ['#0f4c81','#1a6bb5','#2980b9','#3498db','#5dade2','#85c1e9','#aed6f1','#d6eaf8']
+        ax.bar(drug_totals.index, drug_totals.values, color=colors)
+        ax.set_xlabel("Drug Category")
+        ax.set_ylabel("Total Units")
         plt.xticks(rotation=45)
         st.pyplot(fig)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Sales by Weekday")
+        st.markdown('<div class="chart-card"><p class="chart-title">Weekday Sales Pattern</p><p class="chart-sub">Average daily sales by day of week</p>', unsafe_allow_html=True)
         weekday_order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         weekday_sales = df.groupby('Weekday Name')['total_sales'].mean().reindex(weekday_order)
-        fig, ax = plt.subplots(figsize=(8,4))
-        fig.patch.set_facecolor('white')
-        ax.set_facecolor('#faf5ff')
-        ax.bar(weekday_sales.index, weekday_sales.values, color='#2D8E6B')
-        ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+        fig, ax = make_chart((8,4))
+        bars = ax.bar(weekday_sales.index, weekday_sales.values, color='#0f4c81')
+        bars[weekday_sales.values.argmax()].set_color('#e74c3c')
         plt.xticks(rotation=45)
+        ax.set_ylabel("Avg Sales")
         st.pyplot(fig)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.subheader("Sales by Month")
+        st.markdown('<div class="chart-card"><p class="chart-title">Seasonal Sales Pattern</p><p class="chart-sub">Average sales by month — identify peak seasons</p>', unsafe_allow_html=True)
         monthly_avg = df.groupby('Month')['total_sales'].mean()
-        fig, ax = plt.subplots(figsize=(8,4))
-        fig.patch.set_facecolor('white')
-        ax.set_facecolor('#faf5ff')
-        ax.bar(monthly_avg.index, monthly_avg.values, color='#ec4899')
-        ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+        fig, ax = make_chart((8,4))
+        bars = ax.bar(monthly_avg.index, monthly_avg.values, color='#0f4c81')
+        bars[monthly_avg.values.argmax()].set_color('#e74c3c')
+        ax.set_xlabel("Month")
+        ax.set_ylabel("Avg Sales")
         st.pyplot(fig)
+        st.markdown('</div>', unsafe_allow_html=True)
 
+# ML MODEL
 elif page == "ML Model":
-    st.subheader("Random Forest Sales Predictor")
-    col1, col2 = st.columns(2)
-    col1.metric("R² Score", f"{r2*100:.1f}%")
-    col2.metric("Mean Absolute Error", f"{mae:.2f}")
-    st.markdown("---")
+    st.markdown('<p class="section-title">Model Performance</p>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+    col1.metric("R² Score", f"{r2*100:.1f}%", "accuracy")
+    col2.metric("Mean Absolute Error", f"{mae:.2f}", "units")
+    col3.metric("Algorithm", "Random Forest", "100 estimators")
 
-    st.subheader("Feature Importance — What Drives Sales?")
+    st.markdown('<p class="section-title" style="margin-top:24px">Feature Analysis</p>', unsafe_allow_html=True)
     importances = pd.Series(rf.feature_importances_, index=features).sort_values(ascending=False)
-    fig, ax = plt.subplots(figsize=(10,5))
-    fig.patch.set_facecolor('white')
-    ax.set_facecolor('#faf5ff')
-    ax.bar(importances.index, importances.values,
-           color=['#7c3aed' if i == 0 else '#a855f7' if i < 3 else '#c084fc' for i in range(len(importances))])
-    ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+    fig, ax = make_chart((12,5))
+    colors = ['#0f4c81' if i == 0 else '#2980b9' if i < 3 else '#85c1e9' for i in range(len(importances))]
+    ax.bar(importances.index, importances.values, color=colors)
+    ax.set_title("Feature Importance — Drivers of Pharma Sales", fontsize=13, fontweight='600', color='#0f172a', pad=15)
+    ax.set_ylabel("Importance Score")
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-    st.markdown("---")
-    st.subheader("30-Day Sales Forecast")
+    st.markdown('<p class="section-title" style="margin-top:24px">30-Day Sales Forecast</p>', unsafe_allow_html=True)
     future_dates = pd.date_range(start='2020-01-01', periods=30, freq='D')
     future_df = pd.DataFrame({
         'Year': future_dates.year, 'Month': future_dates.month,
@@ -194,18 +360,17 @@ elif page == "ML Model":
         'R03': [df['R03'].mean()] * 30, 'R06': [df['R06'].mean()] * 30,
     })
     preds = rf.predict(future_df)
-    fig, ax = plt.subplots(figsize=(12,5))
-    fig.patch.set_facecolor('white')
-    ax.set_facecolor('#faf5ff')
-    ax.plot(future_dates, preds, color='#7c3aed', linewidth=2.5, marker='o', markersize=5)
-    ax.fill_between(future_dates, preds*0.9, preds*1.1, alpha=0.15, color='#7c3aed', label='Confidence Range')
-    ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+    fig, ax = make_chart((12,5))
+    ax.plot(future_dates, preds, color='#0f4c81', linewidth=2, marker='o', markersize=4)
+    ax.fill_between(future_dates, preds*0.9, preds*1.1, alpha=0.1, color='#0f4c81', label='90% Confidence Interval')
     ax.set_xlabel("Date"); ax.set_ylabel("Predicted Sales")
-    ax.legend(); plt.xticks(rotation=45)
+    ax.legend(fontsize=11)
+    plt.xticks(rotation=45)
     st.pyplot(fig)
 
+# DRUG SEGMENTS
 elif page == "Drug Segments":
-    st.subheader("Drug Segmentation — KMeans Clustering")
+    st.markdown('<p class="section-title">KMeans Drug Segmentation</p>', unsafe_allow_html=True)
     drug_profiles = df[drug_cols].describe().T[['mean','std','max']]
     scaler = StandardScaler()
     drug_scaled = scaler.fit_transform(drug_profiles)
@@ -216,30 +381,31 @@ elif page == "Drug Segments":
 
     col1, col2 = st.columns(2)
     with col1:
+        st.markdown('<p class="chart-title">Drug Segment Classification</p>', unsafe_allow_html=True)
         st.dataframe(drug_profiles[['mean','std','max','segment']].round(2), use_container_width=True)
     with col2:
-        colors_map = {'High Demand':'#2D8E6B','Medium Demand':'#7c3aed','Low Demand':'#ec4899'}
-        fig, ax = plt.subplots(figsize=(8,6))
-        fig.patch.set_facecolor('white')
-        ax.set_facecolor('#faf5ff')
+        colors_map = {'High Demand':'#e74c3c','Medium Demand':'#0f4c81','Low Demand':'#27ae60'}
+        fig, ax = make_chart((8,6))
         for segment, group in drug_profiles.groupby('segment'):
             ax.scatter(group['mean'], group['std'], label=segment,
-                      s=300, color=colors_map.get(segment,'gray'), alpha=0.8, edgecolors='white', linewidth=2)
+                      s=300, color=colors_map.get(segment,'gray'), alpha=0.9, edgecolors='white', linewidth=2)
             for idx, row in group.iterrows():
                 ax.annotate(idx, (row['mean'], row['std']),
-                           textcoords="offset points", xytext=(8,8), fontsize=11, fontweight='bold')
-        ax.set_xlabel("Average Daily Sales"); ax.set_ylabel("Sales Variability")
-        ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
+                           textcoords="offset points", xytext=(8,8), fontsize=11, fontweight='bold', color='#0f172a')
+        ax.set_xlabel("Average Daily Sales")
+        ax.set_ylabel("Sales Variability")
+        ax.set_title("Drug Portfolio Segmentation Matrix", fontsize=13, fontweight='600', color='#0f172a', pad=15)
         ax.legend()
         st.pyplot(fig)
 
+# AI RECOMMENDATIONS
 elif page == "AI Recommendations":
-    st.subheader("AI Generated Business Recommendations")
+    st.markdown('<p class="section-title">AI-Powered Business Intelligence</p>', unsafe_allow_html=True)
     if not api_key:
         st.warning("Please enter your Groq API Key in the sidebar!")
     else:
-        if st.button("Generate AI Report"):
-            with st.spinner("Analyzing data..."):
+        if st.button("Generate Strategic Recommendations"):
+            with st.spinner("Analyzing data with AI..."):
                 drug_totals = df[drug_cols].sum().sort_values(ascending=False)
                 weekday_order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
                 weekday_sales = df.groupby('Weekday Name')['total_sales'].mean().reindex(weekday_order)
@@ -252,38 +418,42 @@ elif page == "AI Recommendations":
                 Best day: {weekday_sales.idxmax()}, Worst day: {weekday_sales.idxmin()}
                 Peak month: {monthly_avg.idxmax()}, Slow month: {monthly_avg.idxmin()}
                 ML R² Score: {r2*100:.1f}%, YoY Growth: {yoy:.1f}%
+                Average daily sales: {df['total_sales'].mean():.2f}
                 """
                 client = Groq(api_key=api_key)
                 response = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=[
-                        {"role": "system", "content": "You are a senior pharma business analyst. Give 5 specific actionable recommendations. Be professional and specific with numbers. No AI-sounding phrases."},
-                        {"role": "user", "content": f"Analyze this pharma data:\n{summary}"}
+                        {"role": "system", "content": "You are a senior pharma business analyst at a top consulting firm. Give 5 specific strategic recommendations. Use a professional consulting tone. Be specific with numbers and percentages. Format with numbered points."},
+                        {"role": "user", "content": f"Analyze this pharma sales data:\n{summary}"}
                     ],
                     temperature=0.7, max_tokens=800
                 )
                 st.markdown(response.choices[0].message.content)
 
+# ASK AI
 elif page == "Ask AI":
-    st.subheader("Ask Anything About Pharma Sales")
+    st.markdown('<p class="section-title">Natural Language Analytics</p>', unsafe_allow_html=True)
+    st.markdown("Ask any question about the pharma sales data in plain English.")
+
     if not api_key:
         st.warning("Please enter your Groq API Key in the sidebar!")
     else:
-        question = st.text_input("Ask a question:", placeholder="Which drug needs more marketing attention?")
-        if st.button("Ask") and question:
-            with st.spinner("Thinking..."):
+        question = st.text_input("", placeholder="e.g. Which drug needs more marketing attention this quarter?")
+        if st.button("Analyze") and question:
+            with st.spinner("Processing..."):
                 drug_totals = df[drug_cols].sum().sort_values(ascending=False)
                 context = f"""
-                Pharma sales dataset with {len(df)} records from {df['datum'].dt.year.min()} to {df['datum'].dt.year.max()}.
-                Drug sales: {drug_totals.to_dict()}
-                Avg daily sales: {df['total_sales'].mean():.2f}
-                ML R² Score: {r2*100:.1f}%
+                Pharma sales dataset: {len(df)} records, {df['datum'].dt.year.min()} to {df['datum'].dt.year.max()}.
+                Drug sales totals: {drug_totals.to_dict()}
+                Average daily sales: {df['total_sales'].mean():.2f}
+                ML Model R² Score: {r2*100:.1f}%
                 """
                 client = Groq(api_key=api_key)
                 response = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
                     messages=[
-                        {"role": "system", "content": "You are a pharma sales analyst. Answer concisely and professionally based on data."},
+                        {"role": "system", "content": "You are a senior pharma sales analyst. Answer concisely and professionally. Use data to support your answer."},
                         {"role": "user", "content": f"Data:\n{context}\n\nQuestion: {question}"}
                     ],
                     temperature=0.7, max_tokens=500
