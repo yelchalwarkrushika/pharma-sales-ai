@@ -14,9 +14,7 @@ st.set_page_config(page_title="Pharma Sales Intelligence", page_icon="📊", lay
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
     * { font-family: 'Inter', sans-serif; }
-
     .stApp { background-color: #f0f2f6; }
 
     [data-testid="stSidebar"] {
@@ -24,16 +22,25 @@ st.markdown("""
         border-right: 1px solid #1e293b;
     }
     [data-testid="stSidebar"] * { color: #94a3b8 !important; }
+
+    [data-testid="stSidebar"] .stRadio > div { gap: 0px; }
+    [data-testid="stSidebar"] .stRadio input[type="radio"] { display: none; }
     [data-testid="stSidebar"] .stRadio label {
+        display: block !important;
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        margin-bottom: 4px !important;
+        transition: 0.2s !important;
+        cursor: pointer !important;
         font-size: 14px !important;
-        padding: 10px 0 !important;
         font-weight: 500 !important;
+        color: #94a3b8 !important;
     }
     [data-testid="stSidebar"] .stRadio label:hover {
+        background: rgba(255,255,255,0.08) !important;
         color: white !important;
     }
 
-    /* Header */
     .top-header {
         background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f4c81 100%);
         padding: 28px 40px;
@@ -43,161 +50,74 @@ st.markdown("""
         justify-content: space-between;
         align-items: center;
     }
-
     .header-title {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: white;
-        letter-spacing: -0.5px;
-        margin: 0;
+        font-size: 1.8rem; font-weight: 800;
+        color: white; letter-spacing: -0.5px; margin: 0;
     }
-
-    .header-sub {
-        font-size: 0.85rem;
-        color: #94a3b8;
-        margin: 6px 0 0 0;
-    }
-
+    .header-sub { font-size: 0.85rem; color: #94a3b8; margin: 6px 0 0 0; }
     .header-badge {
         background: rgba(255,255,255,0.1);
         border: 1px solid rgba(255,255,255,0.2);
-        color: white;
-        padding: 8px 18px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
+        color: white; padding: 8px 18px;
+        border-radius: 20px; font-size: 13px; font-weight: 600;
     }
 
-    /* Metric cards */
-    .metric-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .metric-card {
-        background: white;
-        border-radius: 14px;
-        padding: 22px 24px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        border-top: 3px solid #0f4c81;
-    }
-
-    .metric-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 8px;
-    }
-
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1;
-    }
-
-    .metric-sub {
-        font-size: 12px;
-        color: #94a3b8;
-        margin-top: 6px;
-    }
-
-    /* Chart cards */
-    .chart-card {
-        background: white;
-        border-radius: 14px;
-        padding: 24px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        margin-bottom: 20px;
-    }
-
-    .chart-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 4px;
-    }
-
-    .chart-sub {
-        font-size: 12px;
-        color: #94a3b8;
-        margin-bottom: 16px;
-    }
-
-    /* Section title */
     .section-title {
-        font-size: 11px;
-        font-weight: 700;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        margin-bottom: 16px;
-        padding-bottom: 8px;
+        font-size: 11px; font-weight: 700; color: #64748b;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        margin-bottom: 16px; padding-bottom: 8px;
         border-bottom: 1px solid #e2e8f0;
     }
 
-    /* Buttons */
-    .stButton > button {
-        background: #0f4c81;
-        color: white !important;
-        border: none;
-        border-radius: 10px;
-        padding: 12px 28px;
-        font-weight: 600;
-        font-size: 14px;
-        transition: 0.2s;
-        width: 100%;
+    .chart-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .chart-sub { font-size: 12px; color: #94a3b8; margin-bottom: 16px; }
+
+    [data-testid="stMetric"] {
+        background: white; border-radius: 14px;
+        padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        border-top: 3px solid #0f4c81;
     }
-    .stButton > button:hover {
-        background: #0d3d6b;
-        transform: translateY(-1px);
+    [data-testid="stMetricLabel"] {
+        color: #64748b !important; font-size: 12px !important;
+        font-weight: 600 !important; text-transform: uppercase !important;
+        letter-spacing: 0.8px !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #0f172a !important; font-weight: 800 !important;
+        font-size: 2rem !important;
     }
 
-    /* Input */
+    .stButton > button {
+        background: #0f4c81; color: white !important;
+        border: none; border-radius: 10px;
+        padding: 12px 28px; font-weight: 600;
+        font-size: 14px; transition: 0.2s; width: 100%;
+    }
+    .stButton > button:hover {
+        background: #0d3d6b; transform: translateY(-1px);
+    }
+
     .stTextInput > div > div > input {
-        border-radius: 10px;
-        border: 1.5px solid #e2e8f0;
-        padding: 12px 16px;
-        font-size: 14px;
-        background: white;
+        border-radius: 10px; border: 1.5px solid #e2e8f0;
+        padding: 12px 16px; font-size: 14px; background: white;
     }
     .stTextInput > div > div > input:focus {
         border-color: #0f4c81;
         box-shadow: 0 0 0 3px rgba(15,76,129,0.1);
     }
 
-    /* Sidebar logo */
     .sidebar-logo {
         padding: 24px 16px 16px;
         border-bottom: 1px solid #1e293b;
         margin-bottom: 16px;
     }
+    .sidebar-logo-text { font-size: 16px; font-weight: 700; color: white !important; }
+    .sidebar-logo-sub { font-size: 11px; color: #475569 !important; margin-top: 3px; }
 
-    .sidebar-logo-text {
-        font-size: 16px;
-        font-weight: 700;
-        color: white !important;
-    }
-
-    .sidebar-logo-sub {
-        font-size: 11px;
-        color: #475569 !important;
-        margin-top: 3px;
-    }
-
-    [data-testid="stMetric"] {
-        background: white;
-        border-radius: 14px;
-        padding: 20px;
+    [data-testid="stDataFrame"] {
+        border-radius: 12px; overflow: hidden;
         box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        border-top: 3px solid #0f4c81;
     }
-    [data-testid="stMetricLabel"] { color: #64748b !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.8px !important; }
-    [data-testid="stMetricValue"] { color: #0f172a !important; font-weight: 800 !important; font-size: 2rem !important; }
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -205,7 +125,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Header
 st.markdown("""
 <div class="top-header">
     <div>
@@ -216,7 +135,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar
 st.sidebar.markdown("""
 <div class="sidebar-logo">
     <p class="sidebar-logo-text">PSI Platform</p>
@@ -270,10 +188,8 @@ def make_chart(figsize=(8,4)):
     ax.xaxis.label.set_color('#64748b')
     return fig, ax
 
-# DASHBOARD
 if page == "Dashboard":
     st.markdown('<p class="section-title">Key Performance Indicators</p>', unsafe_allow_html=True)
-
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Records", f"{len(df):,}", "2014 - 2019")
     col2.metric("Avg Daily Sales", f"{df['total_sales'].mean():.1f}", "units/day")
@@ -284,53 +200,44 @@ if page == "Dashboard":
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<div class="chart-card"><p class="chart-title">Monthly Sales Trend</p><p class="chart-sub">Total units sold per month across all drug categories</p>', unsafe_allow_html=True)
+        st.markdown('<p class="chart-title">Monthly Sales Trend</p><p class="chart-sub">Total units sold per month across all drug categories</p>', unsafe_allow_html=True)
         monthly = df.groupby(['Year','Month'])['total_sales'].sum().reset_index()
         fig, ax = make_chart((8,4))
         ax.plot(range(len(monthly)), monthly['total_sales'], color='#0f4c81', linewidth=2)
         ax.fill_between(range(len(monthly)), monthly['total_sales'], alpha=0.08, color='#0f4c81')
-        ax.set_xlabel("Month Index")
-        ax.set_ylabel("Total Sales")
+        ax.set_xlabel("Month Index"); ax.set_ylabel("Total Sales")
         st.pyplot(fig)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="chart-card"><p class="chart-title">Drug Category Performance</p><p class="chart-sub">Cumulative units sold per drug category</p>', unsafe_allow_html=True)
+        st.markdown('<p class="chart-title">Drug Category Performance</p><p class="chart-sub">Cumulative units sold per drug category</p>', unsafe_allow_html=True)
         drug_totals = df[drug_cols].sum().sort_values(ascending=False)
         fig, ax = make_chart((8,4))
         colors = ['#0f4c81','#1a6bb5','#2980b9','#3498db','#5dade2','#85c1e9','#aed6f1','#d6eaf8']
         ax.bar(drug_totals.index, drug_totals.values, color=colors)
-        ax.set_xlabel("Drug Category")
-        ax.set_ylabel("Total Units")
+        ax.set_xlabel("Drug Category"); ax.set_ylabel("Total Units")
         plt.xticks(rotation=45)
         st.pyplot(fig)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<div class="chart-card"><p class="chart-title">Weekday Sales Pattern</p><p class="chart-sub">Average daily sales by day of week</p>', unsafe_allow_html=True)
+        st.markdown('<p class="chart-title">Weekday Sales Pattern</p><p class="chart-sub">Average daily sales by day of week</p>', unsafe_allow_html=True)
         weekday_order = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
         weekday_sales = df.groupby('Weekday Name')['total_sales'].mean().reindex(weekday_order)
         fig, ax = make_chart((8,4))
         bars = ax.bar(weekday_sales.index, weekday_sales.values, color='#0f4c81')
         bars[weekday_sales.values.argmax()].set_color('#e74c3c')
-        plt.xticks(rotation=45)
-        ax.set_ylabel("Avg Sales")
+        plt.xticks(rotation=45); ax.set_ylabel("Avg Sales")
         st.pyplot(fig)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="chart-card"><p class="chart-title">Seasonal Sales Pattern</p><p class="chart-sub">Average sales by month — identify peak seasons</p>', unsafe_allow_html=True)
+        st.markdown('<p class="chart-title">Seasonal Sales Pattern</p><p class="chart-sub">Average sales by month — identify peak seasons</p>', unsafe_allow_html=True)
         monthly_avg = df.groupby('Month')['total_sales'].mean()
         fig, ax = make_chart((8,4))
         bars = ax.bar(monthly_avg.index, monthly_avg.values, color='#0f4c81')
         bars[monthly_avg.values.argmax()].set_color('#e74c3c')
-        ax.set_xlabel("Month")
-        ax.set_ylabel("Avg Sales")
+        ax.set_xlabel("Month"); ax.set_ylabel("Avg Sales")
         st.pyplot(fig)
-        st.markdown('</div>', unsafe_allow_html=True)
 
-# ML MODEL
 elif page == "ML Model":
     st.markdown('<p class="section-title">Model Performance</p>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
@@ -364,11 +271,9 @@ elif page == "ML Model":
     ax.plot(future_dates, preds, color='#0f4c81', linewidth=2, marker='o', markersize=4)
     ax.fill_between(future_dates, preds*0.9, preds*1.1, alpha=0.1, color='#0f4c81', label='90% Confidence Interval')
     ax.set_xlabel("Date"); ax.set_ylabel("Predicted Sales")
-    ax.legend(fontsize=11)
-    plt.xticks(rotation=45)
+    ax.legend(fontsize=11); plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# DRUG SEGMENTS
 elif page == "Drug Segments":
     st.markdown('<p class="section-title">KMeans Drug Segmentation</p>', unsafe_allow_html=True)
     drug_profiles = df[drug_cols].describe().T[['mean','std','max']]
@@ -392,13 +297,11 @@ elif page == "Drug Segments":
             for idx, row in group.iterrows():
                 ax.annotate(idx, (row['mean'], row['std']),
                            textcoords="offset points", xytext=(8,8), fontsize=11, fontweight='bold', color='#0f172a')
-        ax.set_xlabel("Average Daily Sales")
-        ax.set_ylabel("Sales Variability")
+        ax.set_xlabel("Average Daily Sales"); ax.set_ylabel("Sales Variability")
         ax.set_title("Drug Portfolio Segmentation Matrix", fontsize=13, fontweight='600', color='#0f172a', pad=15)
         ax.legend()
         st.pyplot(fig)
 
-# AI RECOMMENDATIONS
 elif page == "AI Recommendations":
     st.markdown('<p class="section-title">AI-Powered Business Intelligence</p>', unsafe_allow_html=True)
     if not api_key:
@@ -418,7 +321,6 @@ elif page == "AI Recommendations":
                 Best day: {weekday_sales.idxmax()}, Worst day: {weekday_sales.idxmin()}
                 Peak month: {monthly_avg.idxmax()}, Slow month: {monthly_avg.idxmin()}
                 ML R² Score: {r2*100:.1f}%, YoY Growth: {yoy:.1f}%
-                Average daily sales: {df['total_sales'].mean():.2f}
                 """
                 client = Groq(api_key=api_key)
                 response = client.chat.completions.create(
@@ -431,11 +333,9 @@ elif page == "AI Recommendations":
                 )
                 st.markdown(response.choices[0].message.content)
 
-# ASK AI
 elif page == "Ask AI":
     st.markdown('<p class="section-title">Natural Language Analytics</p>', unsafe_allow_html=True)
     st.markdown("Ask any question about the pharma sales data in plain English.")
-
     if not api_key:
         st.warning("Please enter your Groq API Key in the sidebar!")
     else:
